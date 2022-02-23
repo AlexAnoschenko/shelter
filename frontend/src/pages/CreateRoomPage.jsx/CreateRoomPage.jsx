@@ -1,5 +1,10 @@
-import CustomButton from '../../components/Button/Button';
+import { useFormik } from 'formik';
 import { makeStyles } from '@mui/styles';
+
+import CustomButton from '../../components/Button/Button';
+import CustomTextField from '../../components/TextField/TextField';
+import { CreateRoomSchema } from './validators';
+import { createRoom } from '../../api/createRoom';
 
 const useStyles = makeStyles(() => ({
   main: {
@@ -15,10 +20,30 @@ const useStyles = makeStyles(() => ({
 const CreateRoomPage = () => {
   const classes = useStyles();
 
+  const formik = useFormik({
+    initialValues: {
+      nickname: '',
+    },
+    onSubmit: async (values) => {
+      createRoom(values.nickname);
+    },
+    validationSchema: CreateRoomSchema,
+  });
+
   return (
-    <div className={classes.main}>
-      <CustomButton textButton='Ready!' />
-    </div>
+    <form className={classes.main} onSubmit={formik.handleSubmit}>
+      <CustomTextField
+        id='nickname'
+        name='nickname'
+        value={formik.values.nickname}
+        onChange={formik.handleChange}
+        error={
+          formik.touched.nickname && Boolean(formik.errors.nickname)
+        }
+        label='Enter your Nickname...'
+      />
+      <CustomButton type='submit' textButton='Ready!' height='62px' />
+    </form>
   );
 };
 

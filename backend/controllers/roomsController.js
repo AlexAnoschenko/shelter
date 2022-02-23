@@ -5,7 +5,7 @@ class roomsController {
     try {
       const room = new Room();
       await room.save();
-      res.json('Room created!');
+      res.json({ roomId: room._id, nickname: req.body.nickname });
     } catch (e) {
       console.log(e);
       res.status(400).json({ message: 'Creating room error' });

@@ -1,10 +1,9 @@
 import Button from '@mui/material/Button';
-import { makeStyles } from '@mui/styles';
 
-const useStyles = makeStyles(() => ({
+const useStyles = ({ width, height }) => ({
   root: {
-    width: (props) => props.width,
-    height: (props) => props.height,
+    width: width,
+    height: height,
     fontSize: '1.5rem !important',
     textTransform: 'none !important',
     backgroundColor: '#5f5f5f !important',
@@ -14,13 +13,18 @@ const useStyles = makeStyles(() => ({
       backgroundColor: '#1b1b1b !important',
     },
   },
-}));
+});
 
-const CustomButton = ({ textButton, width = 280, height = 55 }) => {
+const CustomButton = ({
+  textButton,
+  width = 280,
+  height = 55,
+  type = 'button',
+}) => {
   const classes = useStyles({ width, height });
 
   return (
-    <Button className={classes.root} variant='contained'>
+    <Button sx={classes.root} variant='contained' type={type}>
       {textButton}
     </Button>
   );
