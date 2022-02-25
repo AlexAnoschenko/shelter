@@ -1,6 +1,8 @@
-import CustomButton from '../../components/Button/Button';
 import { makeStyles } from '@mui/styles';
+
+import CustomButton from '../../components/Button/Button';
 import CustomLink from '../../components/Link/Link';
+import { CREATE_ROOM_PAGE } from '../../utils/constants';
 
 const useStyles = makeStyles(() => ({
   main: {
@@ -22,7 +24,7 @@ const StartPage = () => {
   return (
     <div className={classes.main}>
       <div className={classes.title}>S.H.E.L.T.E.R.</div>
-      <CustomLink to='/createRoom'>
+      <CustomLink to={CREATE_ROOM_PAGE}>
         <CustomButton textButton='Create Room!' />
       </CustomLink>
 
