@@ -1,3 +1,4 @@
+import { useHistory } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { makeStyles } from '@mui/styles';
 
@@ -19,6 +20,11 @@ const useStyles = makeStyles(() => ({
 
 const CreateRoomPage = () => {
   const classes = useStyles();
+  const router = useHistory();
+
+  const goToLobbyPage = () => {
+    router.push('/lobbyPage');
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -26,6 +32,7 @@ const CreateRoomPage = () => {
     },
     onSubmit: async (values) => {
       createRoom(values.nickname);
+      goToLobbyPage();
     },
     validationSchema: CreateRoomSchema,
   });
