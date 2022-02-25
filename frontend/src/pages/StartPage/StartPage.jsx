@@ -27,10 +27,6 @@ const StartPage = () => {
       <CustomLink to={CREATE_ROOM_PAGE}>
         <CustomButton textButton='Create Room!' />
       </CustomLink>
-
-      <CustomLink to='/joinRoom'>
-        <CustomButton textButton='Join the Room!' />
-      </CustomLink>
     </div>
   );
 };
