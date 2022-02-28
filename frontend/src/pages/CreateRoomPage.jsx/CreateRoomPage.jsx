@@ -5,7 +5,7 @@ import { makeStyles } from '@mui/styles';
 import CustomButton from '../../components/Button/Button';
 import CustomTextField from '../../components/TextField/TextField';
 import { CreateRoomSchema } from './validators';
-import { createRoom } from '../../api/createRoom';
+import { createRoom } from '../../api/room';
 
 const useStyles = makeStyles(() => ({
   main: {
@@ -16,6 +16,11 @@ const useStyles = makeStyles(() => ({
     alignItems: 'center',
     gap: '18px',
   },
+  error: {
+    fontSize: '20px',
+    color: 'red',
+    textAlign: 'center',
+  },
 }));
 
 const CreateRoomPage = () => {
@@ -23,15 +28,19 @@ const CreateRoomPage = () => {
   const router = useHistory();
 
   const goToLobbyPage = () => {
-    router.push('/lobbyPage');
+    router.push(`/lobbyPage/${localStorage.getItem('roomId')}`);
   };
 
   const formik = useFormik({
     initialValues: {
       nickname: '',
+      numberOfPlayers: '',
     },
     onSubmit: async (values) => {
-      createRoom(values.nickname);
+      await createRoom({
+        nickname: values.nickname,
+        numberOfPlayers: values.numberOfPlayers,
+      });
       goToLobbyPage();
     },
     validationSchema: CreateRoomSchema,
@@ -39,6 +48,10 @@ const CreateRoomPage = () => {
 
   return (
     <form className={classes.main} onSubmit={formik.handleSubmit}>
+      {formik.errors.nickname || formik.errors.numberOfPlayers ? (
+        <div className={classes.error}>Required fields!</div>
+      ) : null}
+
       <CustomTextField
         id='nickname'
         name='nickname'
@@ -48,6 +61,18 @@ const CreateRoomPage = () => {
           formik.touched.nickname && Boolean(formik.errors.nickname)
         }
         label='Enter your Nickname...'
+      />
+      <CustomTextField
+        label='Number of Players...'
+        id='numberOfPlayers'
+        name='numberOfPlayers'
+        value={formik.values.numberOfPlayers}
+        onChange={formik.handleChange}
+        error={
+          formik.touched.numberOfPlayers &&
+          Boolean(formik.errors.numberOfPlayers)
+        }
+        type='number'
       />
       <CustomButton type='submit' textButton='Ready!' height='62px' />
     </form>

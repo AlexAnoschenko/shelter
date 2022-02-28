@@ -1,19 +1,34 @@
+const mongoose = require('mongoose');
+
 const Room = require('../models/room');
 
 class roomsController {
   async createRoom(req, res) {
     try {
-      const room = new Room();
+      const { nickname, numberOfPlayers } = req.body;
+
+      const room = new Room({
+        users: [nickname],
+        numberOfPlayers: numberOfPlayers,
+      });
+
       await room.save();
-      res.json({ roomId: room._id, nickname: req.body.nickname });
+
+      res.json({
+        roomId: room._id,
+        nickname: nickname,
+        numberOfPlayers: numberOfPlayers,
+      });
     } catch (e) {
-      console.log(e);
       res.status(400).json({ message: 'Creating room error' });
     }
   }
 
-  async getRoomId(req, res) {
+  async getRoom(req, res) {
     try {
+      await Room.findById(req.query.id, (err, doc) => {
+        res.json(doc);
+      });
     } catch (e) {}
   }
 }

@@ -1,4 +1,6 @@
 const express = require('express');
+const app = express();
+const WSServer = require('express-ws')(app);
 const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
@@ -8,7 +10,13 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5001;
 
-const app = express();
+// app.ws('/', (ws, req) => {
+//   console.log('BACK WEBSOCKET CONNECTED');
+//   ws.send('FROM BACK');
+//   ws.on('message', (msg) => {
+//     console.log(JSON.parse(msg));
+//   });
+// });
 
 app.use(cors());
 app.use(express.json());

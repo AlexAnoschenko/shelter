@@ -1,4 +1,4 @@
-import { Box, TextField } from '@mui/material';
+import { TextField } from '@mui/material';
 
 const useStyles = () => ({
   root: {
@@ -22,12 +22,6 @@ const useStyles = () => ({
       borderBottom: '2px solid #eee60f',
     },
   },
-  error: {
-    fontSize: '20px',
-    color: 'red',
-    marginBottom: '10px',
-    textAlign: 'center',
-  },
 });
 
 const CustomTextField = ({
@@ -37,12 +31,12 @@ const CustomTextField = ({
   value,
   onChange,
   error,
+  type,
 }) => {
   const classes = useStyles();
 
   return (
     <div>
-      {error && <Box sx={classes.error}>Required field!</Box>}
       <TextField
         sx={classes.root}
         id={id}
@@ -52,6 +46,7 @@ const CustomTextField = ({
         error={error}
         label={label}
         variant='filled'
+        type={type}
       />
     </div>
   );
