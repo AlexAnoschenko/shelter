@@ -26,9 +26,9 @@ class roomsController {
 
   async getRoom(req, res) {
     try {
-      await Room.findById('6218c5baafd9afb0816fd137', (err, doc) =>
-        res.json(doc)
-      );
+      await Room.findById(req.query.id, (err, doc) => {
+        res.json(doc);
+      });
     } catch (e) {}
   }
 }

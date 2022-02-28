@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import { TelegramShareButton, TelegramIcon } from 'react-share';
 
 import Loader from '../../components/Loader/Loader';
 import { addRoomAction } from '../../store/actions/roomActions';
+import { getRoom } from '../../api/room';
 
 const useStyles = makeStyles(() => ({
   main: {
@@ -41,22 +42,32 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const LobbyPage = () => {
+const LobbyPage = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const { room } = useSelector((state) => state.room);
+
+  // const socket = new WebSocket('ws://localhost:5001/');
+
+  // socket.onopen = () => {
+  //   console.log('FRONT SOCKET CONNECTED');
+  // };
+
+  // socket.onmessage = (event) => {
+  //   console.log('MESSAGE', event.data);
+  // };
 
   const getRoomIdFromLS = () => {
     return localStorage.getItem('roomId');
   };
 
-  const addRoom = () => {
-    dispatch(addRoomAction({ id: '123' }));
+  const addRoom = async (res) => {
+    dispatch(addRoomAction(res));
   };
 
-  //-----------------------------
-
-  useEffect(() => {
-    addRoom();
+  useEffect(async () => {
+    const res = await getRoom(props.match.params.id);
+    addRoom(res.data);
   }, []);
 
   return (
@@ -73,7 +84,11 @@ const LobbyPage = () => {
         />
       </TelegramShareButton>
       <Loader />
-      <div className={classes.title}>0 from 6 joined</div>
+      {room && (
+        <div
+          className={classes.title}
+        >{`${room.users.length} from ${room.numberOfPlayers} joined`}</div>
+      )}
     </div>
   );
 };

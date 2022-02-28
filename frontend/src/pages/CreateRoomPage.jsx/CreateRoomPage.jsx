@@ -5,7 +5,7 @@ import { makeStyles } from '@mui/styles';
 import CustomButton from '../../components/Button/Button';
 import CustomTextField from '../../components/TextField/TextField';
 import { CreateRoomSchema } from './validators';
-import { createRoom } from '../../api/createRoom';
+import { createRoom } from '../../api/room';
 
 const useStyles = makeStyles(() => ({
   main: {
