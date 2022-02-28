@@ -6,6 +6,7 @@ import { TelegramShareButton, TelegramIcon } from 'react-share';
 import Loader from '../../components/Loader/Loader';
 import { addRoomAction } from '../../store/actions/roomActions';
 import { getRoom } from '../../api/room';
+import NewUserPage from '../NewUserPage/NewUserPage';
 
 const useStyles = makeStyles(() => ({
   main: {
@@ -46,7 +47,11 @@ const LobbyPage = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { room } = useSelector((state) => state.room);
+  const nickname = localStorage.getItem('nickname');
 
+  if (room) {
+    console.log(room);
+  }
   // const socket = new WebSocket('ws://localhost:5001/');
 
   // socket.onopen = () => {
@@ -65,29 +70,39 @@ const LobbyPage = (props) => {
     dispatch(addRoomAction(res));
   };
 
-  useEffect(async () => {
-    const res = await getRoom(props.match.params.id);
-    addRoom(res.data);
+  useEffect(() => {
+    async function fetchData() {
+      const res = await getRoom(props.match.params.id);
+      addRoom(res.data);
+    }
+
+    fetchData();
   }, []);
 
   return (
     <div className={classes.main}>
-      <div className={classes.title}>Share Link</div>
-      <div className={classes.subTitle}>Click!</div>
-      <TelegramShareButton
-        url={`http://localhost:3000/lobbyPage/${getRoomIdFromLS()}`}
-      >
-        <TelegramIcon
-          size={256}
-          round={true}
-          className={classes.tgIcon}
-        />
-      </TelegramShareButton>
-      <Loader />
-      {room && (
-        <div
-          className={classes.title}
-        >{`${room.users.length} from ${room.numberOfPlayers} joined`}</div>
+      {nickname ? (
+        <>
+          <div className={classes.title}>Share Link</div>
+          <div className={classes.subTitle}>Click!</div>
+          <TelegramShareButton
+            url={`http://localhost:3000/lobbyPage/${getRoomIdFromLS()}`}
+          >
+            <TelegramIcon
+              size={256}
+              round={true}
+              className={classes.tgIcon}
+            />
+          </TelegramShareButton>
+          <Loader />
+          {room && (
+            <div
+              className={classes.title}
+            >{`${room.users.length} from ${room.numberOfPlayers} joined`}</div>
+          )}
+        </>
+      ) : (
+        <NewUserPage />
       )}
     </div>
   );

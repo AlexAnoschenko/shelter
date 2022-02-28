@@ -20,5 +20,24 @@ export const getRoom = async (id) => {
     params: { id },
   });
 
+  if (localStorage.getItem('roomId')) {
+    localStorage.setItem('roomId', id);
+  }
+
+  return res;
+};
+
+export const createUser = async ({ nickname }) => {
+  console.log(nickname);
+  const res = await axios.post(
+    `${appConfig.API_URL}/rooms/createUser`,
+    {
+      nickname,
+    }
+  );
+
+  localStorage.setItem('roomId', res.data.roomId);
+  localStorage.setItem('nickname', res.data.nickname);
+
   return res;
 };

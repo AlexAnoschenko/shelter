@@ -24,6 +24,26 @@ class roomsController {
     }
   }
 
+  //------------------ UPDATE ARRAY
+
+  async createUser(req, res) {
+    console.log('123');
+    try {
+      const { nickname } = req.body;
+
+      const room = new Room({
+        users: users.push(nickname),
+      });
+
+      await room.save();
+
+      res.json({
+        roomId: room._id,
+        nickname: nickname,
+      });
+    } catch (e) {}
+  }
+
   async getRoom(req, res) {
     try {
       await Room.findById(req.query.id, (err, doc) => {
