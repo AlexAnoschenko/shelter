@@ -24,23 +24,17 @@ class roomsController {
     }
   }
 
-  //------------------ UPDATE ARRAY
-
   async createUser(req, res) {
-    console.log('123');
     try {
-      const { nickname } = req.body;
+      const { nickname, id } = req.body;
 
-      const room = new Room({
-        users: users.push(nickname),
-      });
-
-      await room.save();
-
-      res.json({
-        roomId: room._id,
-        nickname: nickname,
-      });
+      await Room.findOneAndUpdate(
+        { id },
+        { $push: { users: nickname } },
+        () => {
+          res.json({ roomId: id, nickname: nickname });
+        }
+      );
     } catch (e) {}
   }
 

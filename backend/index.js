@@ -10,13 +10,13 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5001;
 
-// app.ws('/', (ws, req) => {
-//   console.log('BACK WEBSOCKET CONNECTED');
-//   ws.send('FROM BACK');
-//   ws.on('message', (msg) => {
-//     console.log(JSON.parse(msg));
-//   });
-// });
+app.ws('/', (ws, req) => {
+  console.log('BACK WEBSOCKET CONNECTED');
+  ws.send('FROM BACK');
+  ws.on('message', (msg) => {
+    console.log(JSON.parse(msg));
+  });
+});
 
 app.use(cors());
 app.use(express.json());

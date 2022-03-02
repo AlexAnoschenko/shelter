@@ -1,10 +1,13 @@
 import { useFormik } from 'formik';
 import { makeStyles } from '@mui/styles';
+import { useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 import CustomButton from '../../components/Button/Button';
 import CustomTextField from '../../components/TextField/TextField';
 import { CreateUserSchema } from './validators';
 import { createUser } from '../../api/room';
+import { addNicknameAction } from '../../store/actions/roomActions';
 
 const useStyles = makeStyles(() => ({
   main: {
@@ -24,15 +27,23 @@ const useStyles = makeStyles(() => ({
 
 const NewUserPage = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const { id } = useParams();
+
+  const addNickname = async (res) => {
+    dispatch(addNicknameAction(res));
+  };
 
   const formik = useFormik({
     initialValues: {
       nickname: '',
     },
     onSubmit: async (values) => {
-      await createUser({
+      const res = await createUser({
         nickname: values.nickname,
+        id,
       });
+      addNickname(res.data.nickname);
     },
     validationSchema: CreateUserSchema,
   });

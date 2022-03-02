@@ -1,11 +1,13 @@
 import { useHistory } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { makeStyles } from '@mui/styles';
+import { useDispatch } from 'react-redux';
 
 import CustomButton from '../../components/Button/Button';
 import CustomTextField from '../../components/TextField/TextField';
 import { CreateRoomSchema } from './validators';
 import { createRoom } from '../../api/room';
+import { addNicknameAction } from '../../store/actions/roomActions';
 
 const useStyles = makeStyles(() => ({
   main: {
@@ -25,7 +27,12 @@ const useStyles = makeStyles(() => ({
 
 const CreateRoomPage = () => {
   const classes = useStyles();
+  const dispatch = useDispatch();
   const router = useHistory();
+
+  const addNickname = async (res) => {
+    dispatch(addNicknameAction(res));
+  };
 
   const goToLobbyPage = () => {
     router.push(`/lobbyPage/${localStorage.getItem('roomId')}`);
@@ -37,10 +44,11 @@ const CreateRoomPage = () => {
       numberOfPlayers: '',
     },
     onSubmit: async (values) => {
-      await createRoom({
+      const res = await createRoom({
         nickname: values.nickname,
         numberOfPlayers: values.numberOfPlayers,
       });
+      addNickname(res.data.nickname);
       goToLobbyPage();
     },
     validationSchema: CreateRoomSchema,

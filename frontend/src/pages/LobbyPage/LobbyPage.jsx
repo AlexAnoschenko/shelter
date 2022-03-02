@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import { TelegramShareButton, TelegramIcon } from 'react-share';
 
+import { socket } from '../../socket';
 import Loader from '../../components/Loader/Loader';
 import { addRoomAction } from '../../store/actions/roomActions';
 import { getRoom } from '../../api/room';
@@ -52,15 +53,18 @@ const LobbyPage = (props) => {
   if (room) {
     console.log(room);
   }
-  // const socket = new WebSocket('ws://localhost:5001/');
 
-  // socket.onopen = () => {
-  //   console.log('FRONT SOCKET CONNECTED');
-  // };
+  const connectToWS = () => {
+    socket.onopen = () => {
+      console.log('FRONT SOCKET CONNECTED');
+    };
 
-  // socket.onmessage = (event) => {
-  //   console.log('MESSAGE', event.data);
-  // };
+    socket.onmessage = (event) => {
+      console.log('MESSAGEe', event.data);
+    };
+  };
+
+  connectToWS();
 
   const getRoomIdFromLS = () => {
     return localStorage.getItem('roomId');
@@ -69,6 +73,8 @@ const LobbyPage = (props) => {
   const addRoom = async (res) => {
     dispatch(addRoomAction(res));
   };
+
+  // ------------- Add NICKNAME to store
 
   useEffect(() => {
     async function fetchData() {
