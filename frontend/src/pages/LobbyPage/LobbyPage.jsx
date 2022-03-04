@@ -5,7 +5,10 @@ import { TelegramShareButton, TelegramIcon } from 'react-share';
 
 import { socket } from '../../socket';
 import Loader from '../../components/Loader/Loader';
-import { addRoomAction } from '../../store/actions/roomActions';
+import {
+  addRoomAction,
+  addNicknameAction,
+} from '../../store/actions/roomActions';
 import { getRoom } from '../../api/room';
 import NewUserPage from '../NewUserPage/NewUserPage';
 
@@ -60,11 +63,21 @@ const LobbyPage = (props) => {
     };
 
     socket.onmessage = (event) => {
-      console.log('MESSAGEe', event.data);
+      console.log('MESSAGE', JSON.parse(event.data));
+      addRoom(JSON.parse(event.data));
     };
   };
 
   connectToWS();
+
+  const updateStoreRoom = () => {
+    socket.send(
+      JSON.stringify({
+        method: 'updateRoom',
+        id: room._id,
+      })
+    );
+  };
 
   const getRoomIdFromLS = () => {
     return localStorage.getItem('roomId');
@@ -74,7 +87,9 @@ const LobbyPage = (props) => {
     dispatch(addRoomAction(res));
   };
 
-  // ------------- Add NICKNAME to store
+  const addNickname = async (res) => {
+    dispatch(addNicknameAction(res));
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -82,11 +97,13 @@ const LobbyPage = (props) => {
       addRoom(res.data);
     }
 
+    addNickname(localStorage.getItem('nickname'));
     fetchData();
   }, []);
 
   return (
     <div className={classes.main}>
+      <button onClick={updateStoreRoom}>GO</button>
       {nickname ? (
         <>
           <div className={classes.title}>Share Link</div>
@@ -108,7 +125,7 @@ const LobbyPage = (props) => {
           )}
         </>
       ) : (
-        <NewUserPage />
+        <NewUserPage updateStoreRoom={updateStoreRoom} />
       )}
     </div>
   );

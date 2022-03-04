@@ -25,7 +25,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const NewUserPage = () => {
+const NewUserPage = ({ updateStoreRoom }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const { id } = useParams();
@@ -44,6 +44,7 @@ const NewUserPage = () => {
         id,
       });
       addNickname(res.data.nickname);
+      updateStoreRoom();
     },
     validationSchema: CreateUserSchema,
   });
