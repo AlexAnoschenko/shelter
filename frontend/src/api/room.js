@@ -37,8 +37,6 @@ export const createUser = async ({ nickname, id }) => {
     }
   );
 
-  console.log(res.data);
-
   localStorage.setItem('roomId', res.data.roomId);
   localStorage.setItem('nickname', res.data.nickname);
 

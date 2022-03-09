@@ -1,7 +1,7 @@
 import { useHistory } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { makeStyles } from '@mui/styles';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import CustomButton from '../../components/Button/Button';
 import CustomTextField from '../../components/TextField/TextField';
@@ -27,6 +27,7 @@ const useStyles = makeStyles(() => ({
 
 const CreateRoomPage = () => {
   const classes = useStyles();
+  const { socket } = useSelector((state) => state.room);
   const dispatch = useDispatch();
   const router = useHistory();
 
@@ -35,6 +36,14 @@ const CreateRoomPage = () => {
   };
 
   const goToLobbyPage = () => {
+    socket.send(
+      JSON.stringify({
+        method: 'connection',
+        nickname: localStorage.getItem('nickname'),
+        id: localStorage.getItem('roomId'),
+      })
+    );
+
     router.push(`/lobbyPage/${localStorage.getItem('roomId')}`);
   };
 

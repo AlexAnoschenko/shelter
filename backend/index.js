@@ -19,37 +19,54 @@ app.ws('/', (ws, req) => {
     msg = JSON.parse(msg);
 
     switch (msg.method) {
-      case 'updateRoom':
-        Room.findOne(msg.id)
-          .clone()
-          .then((room) => {
-            ws.id = room.id;
-            aWss.clients.forEach((client) => {
-              if (client.id === msg.id) {
-                client.send(JSON.stringify(room));
-              }
-            });
-          });
+      case 'connection':
+        console.log(msg);
+        connectionHandler(ws, msg);
         break;
 
-      default:
-        break;
+      //---------
+      // case 'updateRoom':
+      //   console.log(msg.id);
+      //   Room.findByIdAndUpdate(
+      //     { _id: msg.id },
+      //     {
+      //       $set: {
+      //         users: 'asdasd',
+      //       },
+      //     }
+      //   )
+      //     .clone()
+      //     .then((room) => {
+      //       console.log(room);
+      //       ws.id = msg.id;
+      //       aWss.clients.forEach((client) => {
+      //         if (client.id === msg.id) {
+      //           client.send(JSON.stringify(room));
+      //         }
+      //       });
+      //     });
+      //   break;
     }
   });
 });
 
-// const connectionHandler = (ws, msg) => {
-//   ws.id = msg.id;
-//   broadcastConnection(ws, msg);
-// };
+const connectionHandler = (ws, msg) => {
+  ws.id = msg.id;
+  broadcastConnection(ws, msg);
+};
 
-// const broadcastConnection = (ws, msg) => {
-//   aWss.clients.forEach((client) => {
-//     if (client.id === msg.id) {
-//       client.send(msg);
-//     }
-//   });
-// };
+const updateRoomHandler = (ws, msg) => {
+  ws.id = msg.id;
+  broadcastConnection(ws, msg);
+};
+
+const broadcastConnection = (ws, msg) => {
+  aWss.clients.forEach((client) => {
+    if (client.id === msg.id) {
+      client.send(`user ${msg.nickname} connected`);
+    }
+  });
+};
 
 app.use(cors());
 app.use(express.json());

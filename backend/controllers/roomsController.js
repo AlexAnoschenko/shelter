@@ -45,6 +45,14 @@ class roomsController {
       });
     } catch (e) {}
   }
+
+  async clearRoom(req, res) {
+    try {
+      await Room.deleteMany({}, () => {
+        console.log('clear');
+      });
+    } catch (e) {}
+  }
 }
 
 module.exports = new roomsController();

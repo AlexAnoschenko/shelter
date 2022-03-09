@@ -1,7 +1,7 @@
 import { useFormik } from 'formik';
 import { makeStyles } from '@mui/styles';
 import { useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import CustomButton from '../../components/Button/Button';
 import CustomTextField from '../../components/TextField/TextField';
@@ -27,6 +27,7 @@ const useStyles = makeStyles(() => ({
 
 const NewUserPage = ({ updateStoreRoom }) => {
   const classes = useStyles();
+  const { socket } = useSelector((state) => state.room);
   const dispatch = useDispatch();
   const { id } = useParams();
 
@@ -44,6 +45,15 @@ const NewUserPage = ({ updateStoreRoom }) => {
         id,
       });
       addNickname(res.data.nickname);
+
+      socket.send(
+        JSON.stringify({
+          method: 'connection',
+          nickname: res.data.nickname,
+          id: id,
+        })
+      );
+
       updateStoreRoom();
     },
     validationSchema: CreateUserSchema,

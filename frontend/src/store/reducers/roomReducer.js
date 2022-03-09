@@ -1,6 +1,7 @@
 const initialValues = {
   nickname: null,
   room: null,
+  socket: new WebSocket('ws://localhost:5001/'),
 };
 
 export const roomReducer = (state = initialValues, action) => {

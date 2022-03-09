@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 import { TelegramShareButton, TelegramIcon } from 'react-share';
 
-import { socket } from '../../socket';
 import Loader from '../../components/Loader/Loader';
 import {
   addRoomAction,
@@ -50,25 +49,12 @@ const useStyles = makeStyles(() => ({
 const LobbyPage = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { room } = useSelector((state) => state.room);
+  const { room, socket } = useSelector((state) => state.room);
   const nickname = localStorage.getItem('nickname');
 
   if (room) {
     console.log(room);
   }
-
-  const connectToWS = () => {
-    socket.onopen = () => {
-      console.log('FRONT SOCKET CONNECTED');
-    };
-
-    socket.onmessage = (event) => {
-      console.log('MESSAGE', JSON.parse(event.data));
-      addRoom(JSON.parse(event.data));
-    };
-  };
-
-  connectToWS();
 
   const updateStoreRoom = () => {
     socket.send(
@@ -92,6 +78,12 @@ const LobbyPage = (props) => {
   };
 
   useEffect(() => {
+    socket.onmessage = (event) => {
+      console.log(event.data);
+    };
+  }, [socket]);
+
+  useEffect(() => {
     async function fetchData() {
       const res = await getRoom(props.match.params.id);
       addRoom(res.data);
@@ -103,7 +95,6 @@ const LobbyPage = (props) => {
 
   return (
     <div className={classes.main}>
-      <button onClick={updateStoreRoom}>GO</button>
       {nickname ? (
         <>
           <div className={classes.title}>Share Link</div>
