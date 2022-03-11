@@ -4,6 +4,7 @@ import { makeStyles } from '@mui/styles';
 import { TelegramShareButton, TelegramIcon } from 'react-share';
 
 import Loader from '../../components/Loader/Loader';
+import UsersLoader from '../../components/UsersLoader/UsersLoader';
 import {
   addRoomAction,
   addNicknameAction,
@@ -22,6 +23,8 @@ const useStyles = makeStyles(() => ({
   },
   title: {
     fontSize: '1.6rem',
+    marginBottom: '20px',
+    textAlign: 'center',
   },
   subTitle: {
     fontSize: '1.6rem',
@@ -44,6 +47,18 @@ const useStyles = makeStyles(() => ({
       borderColor: '#e0d01c',
     },
   },
+  users: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: '10px',
+    paddingLeft: '10px',
+    paddingRight: '10px',
+    color: '#c4ee0b',
+    textShadow:
+      '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000',
+    fontSize: '20px',
+  },
 }));
 
 const LobbyPage = (props) => {
@@ -52,15 +67,12 @@ const LobbyPage = (props) => {
   const { room, socket } = useSelector((state) => state.room);
   const nickname = localStorage.getItem('nickname');
 
-  if (room) {
-    console.log(room);
-  }
-
   const updateStoreRoom = () => {
     socket.send(
       JSON.stringify({
         method: 'updateRoom',
         id: room._id,
+        nickname: localStorage.getItem('nickname'),
       })
     );
   };
@@ -77,9 +89,27 @@ const LobbyPage = (props) => {
     dispatch(addNicknameAction(res));
   };
 
+  const clearLS = () => {
+    localStorage.clear();
+  };
+
+  useEffect(() => {
+    if (socket.readyState === 1) {
+      socket.send(
+        JSON.stringify({
+          method: 'connection',
+          nickname: localStorage.getItem('nickname'),
+          id: localStorage.getItem('roomId'),
+        })
+      );
+    }
+  }, [socket.readyState]);
+
   useEffect(() => {
     socket.onmessage = (event) => {
-      console.log(event.data);
+      if (JSON.parse(event.data).users) {
+        addRoom(JSON.parse(event.data));
+      }
     };
   }, [socket]);
 
@@ -95,6 +125,7 @@ const LobbyPage = (props) => {
 
   return (
     <div className={classes.main}>
+      <button onClick={clearLS}>Clear LS</button>
       {nickname ? (
         <>
           <div className={classes.title}>Share Link</div>
@@ -109,10 +140,28 @@ const LobbyPage = (props) => {
             />
           </TelegramShareButton>
           <Loader />
-          {room && (
-            <div
-              className={classes.title}
-            >{`${room.users.length} from ${room.numberOfPlayers} joined`}</div>
+          {room ? (
+            <div>
+              <div
+                className={classes.title}
+              >{`${room.users.length} from ${room.numberOfPlayers} joined`}</div>
+              <div className={classes.users}>
+                {room.users.map((user) => (
+                  <div
+                    style={{
+                      color: `#${Math.floor(
+                        Math.random() * 16777215
+                      ).toString(16)}`,
+                    }}
+                    key={user}
+                  >
+                    {user}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <UsersLoader />
           )}
         </>
       ) : (

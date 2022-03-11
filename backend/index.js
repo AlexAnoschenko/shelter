@@ -20,32 +20,21 @@ app.ws('/', (ws, req) => {
 
     switch (msg.method) {
       case 'connection':
-        console.log(msg);
         connectionHandler(ws, msg);
         break;
 
-      //---------
-      // case 'updateRoom':
-      //   console.log(msg.id);
-      //   Room.findByIdAndUpdate(
-      //     { _id: msg.id },
-      //     {
-      //       $set: {
-      //         users: 'asdasd',
-      //       },
-      //     }
-      //   )
-      //     .clone()
-      //     .then((room) => {
-      //       console.log(room);
-      //       ws.id = msg.id;
-      //       aWss.clients.forEach((client) => {
-      //         if (client.id === msg.id) {
-      //           client.send(JSON.stringify(room));
-      //         }
-      //       });
-      //     });
-      //   break;
+      case 'updateRoom':
+        Room.findById(msg.id).then((room) => {
+          room.users.push(msg.nickname);
+          room.save();
+          ws.id = msg.id;
+          aWss.clients.forEach((client) => {
+            if (client.id === msg.id) {
+              client.send(JSON.stringify(room));
+            }
+          });
+        });
+        break;
     }
   });
 });
@@ -55,15 +44,10 @@ const connectionHandler = (ws, msg) => {
   broadcastConnection(ws, msg);
 };
 
-const updateRoomHandler = (ws, msg) => {
-  ws.id = msg.id;
-  broadcastConnection(ws, msg);
-};
-
 const broadcastConnection = (ws, msg) => {
   aWss.clients.forEach((client) => {
     if (client.id === msg.id) {
-      client.send(`user ${msg.nickname} connected`);
+      client.send(JSON.stringify(`user ${msg.nickname} connected`));
     }
   });
 };
