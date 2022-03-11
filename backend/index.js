@@ -1,22 +1,56 @@
 const express = require('express');
 const app = express();
 const WSServer = require('express-ws')(app);
+const aWss = WSServer.getWss();
 const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const roomsRouters = require('./routers/roomsRouter');
+const Room = require('./models/room');
 
 dotenv.config();
 
 const PORT = process.env.PORT || 5001;
 
-// app.ws('/', (ws, req) => {
-//   console.log('BACK WEBSOCKET CONNECTED');
-//   ws.send('FROM BACK');
-//   ws.on('message', (msg) => {
-//     console.log(JSON.parse(msg));
-//   });
-// });
+app.ws('/', (ws, req) => {
+  console.log('BACK WEBSOCKET CONNECTED');
+
+  ws.on('message', (msg) => {
+    msg = JSON.parse(msg);
+
+    switch (msg.method) {
+      case 'connection':
+        connectionHandler(ws, msg);
+        break;
+
+      case 'updateRoom':
+        Room.findById(msg.id).then((room) => {
+          room.users.push(msg.nickname);
+          room.save();
+          ws.id = msg.id;
+          aWss.clients.forEach((client) => {
+            if (client.id === msg.id) {
+              client.send(JSON.stringify(room));
+            }
+          });
+        });
+        break;
+    }
+  });
+});
+
+const connectionHandler = (ws, msg) => {
+  ws.id = msg.id;
+  broadcastConnection(ws, msg);
+};
+
+const broadcastConnection = (ws, msg) => {
+  aWss.clients.forEach((client) => {
+    if (client.id === msg.id) {
+      client.send(JSON.stringify(`user ${msg.nickname} connected`));
+    }
+  });
+};
 
 app.use(cors());
 app.use(express.json());

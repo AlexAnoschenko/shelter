@@ -24,10 +24,32 @@ class roomsController {
     }
   }
 
+  async createUser(req, res) {
+    try {
+      const { nickname, id } = req.body;
+
+      await Room.findOneAndUpdate(
+        { id },
+        { $push: { users: nickname } },
+        () => {
+          res.json({ roomId: id, nickname: nickname });
+        }
+      );
+    } catch (e) {}
+  }
+
   async getRoom(req, res) {
     try {
       await Room.findById(req.query.id, (err, doc) => {
         res.json(doc);
+      });
+    } catch (e) {}
+  }
+
+  async clearRoom(req, res) {
+    try {
+      await Room.deleteMany({}, () => {
+        console.log('clear');
       });
     } catch (e) {}
   }

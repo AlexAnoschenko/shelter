@@ -1,12 +1,12 @@
-import { useHistory } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { makeStyles } from '@mui/styles';
+import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import CustomButton from '../../components/Button/Button';
 import CustomTextField from '../../components/TextField/TextField';
-import { CreateRoomSchema } from './validators';
-import { createRoom } from '../../api/room';
+import { CreateUserSchema } from './validators';
+import { createUser } from '../../api/room';
 import { addNicknameAction } from '../../store/actions/roomActions';
 
 const useStyles = makeStyles(() => ({
@@ -25,47 +25,43 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const CreateRoomPage = () => {
+const NewUserPage = ({ updateStoreRoom }) => {
   const classes = useStyles();
   const { socket } = useSelector((state) => state.room);
   const dispatch = useDispatch();
-  const router = useHistory();
+  const { id } = useParams();
 
   const addNickname = async (res) => {
     dispatch(addNicknameAction(res));
   };
 
-  const goToLobbyPage = () => {
-    socket.send(
-      JSON.stringify({
-        method: 'connection',
-        nickname: localStorage.getItem('nickname'),
-        id: localStorage.getItem('roomId'),
-      })
-    );
-
-    router.push(`/lobbyPage/${localStorage.getItem('roomId')}`);
-  };
-
   const formik = useFormik({
     initialValues: {
       nickname: '',
-      numberOfPlayers: '',
     },
     onSubmit: async (values) => {
-      const res = await createRoom({
+      const res = await createUser({
         nickname: values.nickname,
-        numberOfPlayers: values.numberOfPlayers,
+        id,
       });
       addNickname(res.data.nickname);
-      goToLobbyPage();
+
+      socket.send(
+        JSON.stringify({
+          method: 'connection',
+          nickname: res.data.nickname,
+          id: id,
+        })
+      );
+
+      updateStoreRoom();
     },
-    validationSchema: CreateRoomSchema,
+    validationSchema: CreateUserSchema,
   });
 
   return (
     <form className={classes.main} onSubmit={formik.handleSubmit}>
-      {formik.errors.nickname || formik.errors.numberOfPlayers ? (
+      {formik.errors.nickname ? (
         <div className={classes.error}>Required fields!</div>
       ) : null}
 
@@ -79,21 +75,10 @@ const CreateRoomPage = () => {
         }
         label='Enter your Nickname...'
       />
-      <CustomTextField
-        label='Number of Players...'
-        id='numberOfPlayers'
-        name='numberOfPlayers'
-        value={formik.values.numberOfPlayers}
-        onChange={formik.handleChange}
-        error={
-          formik.touched.numberOfPlayers &&
-          Boolean(formik.errors.numberOfPlayers)
-        }
-        type='number'
-      />
+
       <CustomButton type='submit' textButton='Ready!' height='62px' />
     </form>
   );
 };
 
-export default CreateRoomPage;
+export default NewUserPage;
