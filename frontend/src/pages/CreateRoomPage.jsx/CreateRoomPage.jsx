@@ -7,7 +7,7 @@ import CustomButton from '../../components/Button/Button';
 import CustomTextField from '../../components/TextField/TextField';
 import { CreateRoomSchema } from './validators';
 import { createRoom } from '../../api/room';
-import { addNicknameAction } from '../../store/actions/roomActions';
+import { addUserAction } from '../../store/actions/roomActions';
 
 const useStyles = makeStyles(() => ({
   main: {
@@ -31,8 +31,8 @@ const CreateRoomPage = () => {
   const dispatch = useDispatch();
   const router = useHistory();
 
-  const addNickname = async (res) => {
-    dispatch(addNicknameAction(res));
+  const addUser = async (res) => {
+    dispatch(addUserAction(res));
   };
 
   const goToLobbyPage = () => {
@@ -57,7 +57,7 @@ const CreateRoomPage = () => {
         nickname: values.nickname,
         numberOfPlayers: values.numberOfPlayers,
       });
-      addNickname(res.data.nickname);
+      addUser(res.data.user);
       goToLobbyPage();
     },
     validationSchema: CreateRoomSchema,

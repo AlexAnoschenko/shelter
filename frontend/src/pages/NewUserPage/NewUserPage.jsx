@@ -7,7 +7,7 @@ import CustomButton from '../../components/Button/Button';
 import CustomTextField from '../../components/TextField/TextField';
 import { CreateUserSchema } from './validators';
 import { createUser } from '../../api/room';
-import { addNicknameAction } from '../../store/actions/roomActions';
+import { addUserAction } from '../../store/actions/roomActions';
 
 const useStyles = makeStyles(() => ({
   main: {
@@ -31,8 +31,8 @@ const NewUserPage = ({ updateStoreRoom }) => {
   const dispatch = useDispatch();
   const { id } = useParams();
 
-  const addNickname = async (res) => {
-    dispatch(addNicknameAction(res));
+  const addUser = async (res) => {
+    dispatch(addUserAction(res));
   };
 
   const formik = useFormik({
@@ -44,12 +44,12 @@ const NewUserPage = ({ updateStoreRoom }) => {
         nickname: values.nickname,
         id,
       });
-      addNickname(res.data.nickname);
+      addUser(res.data.user);
 
       socket.send(
         JSON.stringify({
           method: 'connection',
-          nickname: res.data.nickname,
+          nickname: res.data.user.nickname,
           id: id,
         })
       );
