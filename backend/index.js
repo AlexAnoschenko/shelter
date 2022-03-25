@@ -6,6 +6,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const roomsRouters = require('./routers/roomsRouter');
+const cardsRouters = require('./routers/cardsRouter');
 const Room = require('./models/room');
 
 dotenv.config();
@@ -55,6 +56,7 @@ const broadcastConnection = (ws, msg) => {
 app.use(cors());
 app.use(express.json());
 app.use('/rooms', roomsRouters);
+app.use('/cards', cardsRouters);
 
 const start = async () => {
   try {

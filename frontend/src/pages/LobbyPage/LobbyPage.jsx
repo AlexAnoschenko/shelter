@@ -11,6 +11,7 @@ import {
   addUserAction,
 } from '../../store/actions/roomActions';
 import { getRoom } from '../../api/room';
+import { getCards } from '../../api/card';
 import NewUserPage from '../NewUserPage/NewUserPage';
 
 const useStyles = makeStyles(() => ({
@@ -99,9 +100,17 @@ const LobbyPage = (props) => {
   };
 
   useEffect(() => {
+    async function fetchData() {
+      const res = await getCards(props.match.params.id);
+      console.log(res);
+    }
+
     if (room && room.users.length === room.numberOfPlayers) {
       router.push(`/gamePage/${localStorage.getItem('roomId')}`);
+
+      fetchData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room]);
 
   useEffect(() => {
@@ -114,6 +123,7 @@ const LobbyPage = (props) => {
         })
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket.readyState]);
 
   useEffect(() => {
@@ -122,6 +132,7 @@ const LobbyPage = (props) => {
         addRoom(JSON.parse(event.data));
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket]);
 
   useEffect(() => {
@@ -135,6 +146,7 @@ const LobbyPage = (props) => {
       nickname: localStorage.getItem('nickname'),
     });
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

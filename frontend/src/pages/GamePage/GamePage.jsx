@@ -43,6 +43,7 @@ const GamePage = (props) => {
       nickname: localStorage.getItem('nickname'),
     });
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

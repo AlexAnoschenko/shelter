@@ -9,7 +9,7 @@ class roomsController {
       const { nickname, numberOfPlayers } = req.body;
 
       const room = new Room({
-        users: [{ userId: uuidv4(), nickname: nickname }],
+        users: [{ userId: uuidv4(), nickname: nickname, cards: [] }],
         numberOfPlayers: numberOfPlayers,
       });
 
@@ -17,7 +17,11 @@ class roomsController {
 
       res.json({
         roomId: room._id,
-        user: { userId: room.users[0].userId, nickname: nickname },
+        user: {
+          userId: room.users[0].userId,
+          nickname: nickname,
+          cards: [],
+        },
         numberOfPlayers: numberOfPlayers,
       });
     } catch (e) {
@@ -34,7 +38,9 @@ class roomsController {
       await Room.findOneAndUpdate(
         { id },
         {
-          $push: { users: { userId: userId, nickname: nickname } },
+          $push: {
+            users: { userId: userId, nickname: nickname, cards: [] },
+          },
         },
         () => {
           res.json({
