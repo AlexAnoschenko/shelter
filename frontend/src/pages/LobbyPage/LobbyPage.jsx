@@ -70,6 +70,10 @@ const LobbyPage = (props) => {
   const { room, socket } = useSelector((state) => state.room);
   const nickname = localStorage.getItem('nickname');
 
+  if (room?.users[0].cards.length) {
+    console.log(room.users[0].cards);
+  }
+
   const updateStoreRoom = () => {
     socket.send(
       JSON.stringify({
@@ -78,6 +82,7 @@ const LobbyPage = (props) => {
         user: {
           userId: localStorage.getItem('userId'),
           nickname: localStorage.getItem('nickname'),
+          cards: [],
         },
       })
     );
@@ -102,7 +107,8 @@ const LobbyPage = (props) => {
   useEffect(() => {
     async function fetchData() {
       const res = await getCards(props.match.params.id);
-      console.log(res);
+      console.log(res); // ----------------------------------- Users with Cards --------- !!!
+      addRoom(res.data);
     }
 
     if (room && room.users.length === room.numberOfPlayers) {

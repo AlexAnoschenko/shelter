@@ -51,6 +51,7 @@ const NewUserPage = ({ updateStoreRoom }) => {
           method: 'connection',
           nickname: res.data.user.nickname,
           id: id,
+          cards: [],
         })
       );
 

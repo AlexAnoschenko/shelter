@@ -8,22 +8,42 @@ function randomCard(arr) {
   return arr[rand];
 }
 
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
 class cardsController {
   async getCards(req, res) {
     try {
-      await Room.findById(req.body.params.id, async (err, room) => {
-        const cards = await Card.find({});
-
-        room.users.forEach((user, userIndex) => {
-          console.log(user);
-          cards[0].cards.forEach((type, cardsIndex) => {
-            console.log('type', type);
-            room.users[userIndex].cards.push(type);
-          });
-        });
-
-        res.json(room);
+      const room = await Room.findOne({
+        _id: req.body.params.id,
       });
+
+      const cards = await Card.find({});
+
+      room.users.forEach((user, userIndex) => {
+        cards[0].cards.forEach((type, cardsIndex) => {
+          for (let key in type) {
+            shuffle(type[key]);
+            room.users[userIndex].cards.push(type[key].shift());
+          }
+        });
+      });
+
+      await Room.findOneAndUpdate(
+        { _id: req.body.params.id },
+        {
+          $set: {
+            users: room.users,
+          },
+        },
+        () => {
+          res.json(room);
+        }
+      );
     } catch (e) {}
   }
 }

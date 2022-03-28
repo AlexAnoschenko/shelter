@@ -39,13 +39,17 @@ class roomsController {
         { id },
         {
           $push: {
-            users: { userId: userId, nickname: nickname, cards: [] },
+            users: {
+              userId: userId,
+              nickname: nickname,
+              cards: [],
+            },
           },
         },
         () => {
           res.json({
             roomId: id,
-            user: { userId: userId, nickname: nickname },
+            user: { userId: userId, nickname: nickname, cards: [] },
           });
         }
       );
