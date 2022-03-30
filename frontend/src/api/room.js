@@ -11,7 +11,8 @@ export const createRoom = async ({ nickname, numberOfPlayers }) => {
   );
 
   localStorage.setItem('roomId', res.data.roomId);
-  localStorage.setItem('nickname', res.data.nickname);
+  localStorage.setItem('userId', res.data.user.userId);
+  localStorage.setItem('nickname', res.data.user.nickname);
 
   return res;
 };
@@ -38,7 +39,8 @@ export const createUser = async ({ nickname, id }) => {
   );
 
   localStorage.setItem('roomId', res.data.roomId);
-  localStorage.setItem('nickname', res.data.nickname);
+  localStorage.setItem('userId', res.data.user.userId);
+  localStorage.setItem('nickname', res.data.user.nickname);
 
   return res;
 };

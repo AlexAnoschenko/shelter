@@ -7,7 +7,7 @@ export const addRoomAction = (payload) => ({
   payload,
 });
 
-export const addNicknameAction = (payload) => ({
-  type: 'ADD_NICKNAME',
+export const addUserAction = (payload) => ({
+  type: 'ADD_USER',
   payload,
 });

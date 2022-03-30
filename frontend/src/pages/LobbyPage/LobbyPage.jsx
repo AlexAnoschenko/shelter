@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { TelegramShareButton, TelegramIcon } from 'react-share';
 
@@ -7,9 +8,10 @@ import Loader from '../../components/Loader/Loader';
 import UsersLoader from '../../components/UsersLoader/UsersLoader';
 import {
   addRoomAction,
-  addNicknameAction,
+  addUserAction,
 } from '../../store/actions/roomActions';
 import { getRoom } from '../../api/room';
+import { getCards } from '../../api/card';
 import NewUserPage from '../NewUserPage/NewUserPage';
 
 const useStyles = makeStyles(() => ({
@@ -64,15 +66,24 @@ const useStyles = makeStyles(() => ({
 const LobbyPage = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const router = useHistory();
   const { room, socket } = useSelector((state) => state.room);
   const nickname = localStorage.getItem('nickname');
+
+  if (room?.users[0].cards.length) {
+    console.log(room.users[0].cards);
+  }
 
   const updateStoreRoom = () => {
     socket.send(
       JSON.stringify({
         method: 'updateRoom',
         id: room._id,
-        nickname: localStorage.getItem('nickname'),
+        user: {
+          userId: localStorage.getItem('userId'),
+          nickname: localStorage.getItem('nickname'),
+          cards: [],
+        },
       })
     );
   };
@@ -85,13 +96,28 @@ const LobbyPage = (props) => {
     dispatch(addRoomAction(res));
   };
 
-  const addNickname = async (res) => {
-    dispatch(addNicknameAction(res));
+  const addUser = async (res) => {
+    dispatch(addUserAction(res));
   };
 
   const clearLS = () => {
     localStorage.clear();
   };
+
+  useEffect(() => {
+    async function fetchData() {
+      const res = await getCards(props.match.params.id);
+      console.log(res); // ----------------------------------- Users with Cards --------- !!!
+      addRoom(res.data);
+    }
+
+    if (room && room.users.length === room.numberOfPlayers) {
+      router.push(`/gamePage/${localStorage.getItem('roomId')}`);
+
+      fetchData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room]);
 
   useEffect(() => {
     if (socket.readyState === 1) {
@@ -103,6 +129,7 @@ const LobbyPage = (props) => {
         })
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket.readyState]);
 
   useEffect(() => {
@@ -111,6 +138,7 @@ const LobbyPage = (props) => {
         addRoom(JSON.parse(event.data));
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket]);
 
   useEffect(() => {
@@ -119,8 +147,12 @@ const LobbyPage = (props) => {
       addRoom(res.data);
     }
 
-    addNickname(localStorage.getItem('nickname'));
+    addUser({
+      userId: localStorage.getItem('userId'),
+      nickname: localStorage.getItem('nickname'),
+    });
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -153,9 +185,9 @@ const LobbyPage = (props) => {
                         Math.random() * 16777215
                       ).toString(16)}`,
                     }}
-                    key={user}
+                    key={user.userId}
                   >
-                    {user}
+                    {user.nickname}
                   </div>
                 ))}
               </div>

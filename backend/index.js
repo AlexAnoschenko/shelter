@@ -6,6 +6,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const roomsRouters = require('./routers/roomsRouter');
+const cardsRouters = require('./routers/cardsRouter');
 const Room = require('./models/room');
 
 dotenv.config();
@@ -13,7 +14,7 @@ dotenv.config();
 const PORT = process.env.PORT || 5001;
 
 app.ws('/', (ws, req) => {
-  console.log('BACK WEBSOCKET CONNECTED');
+  console.log('--- BACK WEBSOCKET CONNECTED ---');
 
   ws.on('message', (msg) => {
     msg = JSON.parse(msg);
@@ -25,7 +26,7 @@ app.ws('/', (ws, req) => {
 
       case 'updateRoom':
         Room.findById(msg.id).then((room) => {
-          room.users.push(msg.nickname);
+          room.users.push(msg.user);
           room.save();
           ws.id = msg.id;
           aWss.clients.forEach((client) => {
@@ -55,6 +56,7 @@ const broadcastConnection = (ws, msg) => {
 app.use(cors());
 app.use(express.json());
 app.use('/rooms', roomsRouters);
+app.use('/cards', cardsRouters);
 
 const start = async () => {
   try {

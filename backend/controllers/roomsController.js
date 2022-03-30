@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
 const Room = require('../models/room');
 
@@ -8,7 +9,7 @@ class roomsController {
       const { nickname, numberOfPlayers } = req.body;
 
       const room = new Room({
-        users: [nickname],
+        users: [{ userId: uuidv4(), nickname: nickname, cards: [] }],
         numberOfPlayers: numberOfPlayers,
       });
 
@@ -16,7 +17,11 @@ class roomsController {
 
       res.json({
         roomId: room._id,
-        nickname: nickname,
+        user: {
+          userId: room.users[0].userId,
+          nickname: nickname,
+          cards: [],
+        },
         numberOfPlayers: numberOfPlayers,
       });
     } catch (e) {
@@ -28,11 +33,24 @@ class roomsController {
     try {
       const { nickname, id } = req.body;
 
+      const userId = uuidv4();
+
       await Room.findOneAndUpdate(
         { id },
-        { $push: { users: nickname } },
+        {
+          $push: {
+            users: {
+              userId: userId,
+              nickname: nickname,
+              cards: [],
+            },
+          },
+        },
         () => {
-          res.json({ roomId: id, nickname: nickname });
+          res.json({
+            roomId: id,
+            user: { userId: userId, nickname: nickname, cards: [] },
+          });
         }
       );
     } catch (e) {}
