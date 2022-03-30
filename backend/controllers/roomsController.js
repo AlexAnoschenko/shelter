@@ -9,7 +9,14 @@ class roomsController {
       const { nickname, numberOfPlayers } = req.body;
 
       const room = new Room({
-        users: [{ userId: uuidv4(), nickname: nickname, cards: [] }],
+        users: [
+          {
+            userId: uuidv4(),
+            role: 'admin',
+            nickname: nickname,
+            cards: [],
+          },
+        ],
         numberOfPlayers: numberOfPlayers,
       });
 
@@ -19,6 +26,7 @@ class roomsController {
         roomId: room._id,
         user: {
           userId: room.users[0].userId,
+          role: room.users[0].role,
           nickname: nickname,
           cards: [],
         },
@@ -41,6 +49,7 @@ class roomsController {
           $push: {
             users: {
               userId: userId,
+              role: 'player',
               nickname: nickname,
               cards: [],
             },
@@ -49,7 +58,12 @@ class roomsController {
         () => {
           res.json({
             roomId: id,
-            user: { userId: userId, nickname: nickname, cards: [] },
+            user: {
+              userId: userId,
+              role: 'player',
+              nickname: nickname,
+              cards: [],
+            },
           });
         }
       );

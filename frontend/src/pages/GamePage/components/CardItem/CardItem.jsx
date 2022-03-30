@@ -1,6 +1,6 @@
 import { makeStyles } from '@mui/styles';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   main: {
     width: '90px',
     minHeight: '120px',
@@ -8,8 +8,10 @@ const useStyles = makeStyles(() => ({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    textAlign: 'center',
     gap: 18,
-    backgroundColor: '#016b2a',
+    backgroundColor: (props) =>
+      props.isVisible ? '#016b2a' : '#3b3b3b',
     padding: '10px',
     border: '2px solid black',
     borderRadius: '10px',
@@ -17,7 +19,7 @@ const useStyles = makeStyles(() => ({
 }));
 
 const CardItem = ({ card }) => {
-  const classes = useStyles();
+  const classes = useStyles({ isVisible: card.isVisible });
 
   return (
     <div className={classes.main}>

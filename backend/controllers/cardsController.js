@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 const Room = require('../models/room');
 const Card = require('../models/card');
 
-function randomCard(arr) {
-  let rand = Math.floor(Math.random() * arr.length);
-  return arr[rand];
-}
+// function randomCard(arr) {
+//   let rand = Math.floor(Math.random() * arr.length);
+//   return arr[rand];
+// }
 
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -41,7 +41,8 @@ class cardsController {
           },
         },
         () => {
-          res.json(room);
+          return room;
+          //   res.json(room);
         }
       );
     } catch (e) {}
