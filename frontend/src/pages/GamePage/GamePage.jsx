@@ -18,6 +18,9 @@ const useStyles = makeStyles(() => ({
     gap: 18,
     padding: 10,
   },
+  label: {
+    fontSize: '28px',
+  },
   cardsList: {
     display: 'flex',
     flexDirection: 'row',
@@ -30,10 +33,24 @@ const useStyles = makeStyles(() => ({
 const GamePage = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { user, room } = useSelector((state) => state.room);
+  const { user, room, socket } = useSelector((state) => state.room);
   const [currentPlayer, setCurrentPlayer] = useState(
     localStorage.getItem('nickname')
   );
+
+  const openCard = (card) => {
+    socket.send(
+      JSON.stringify({
+        method: 'openCard',
+        id: room._id,
+        user: {
+          userId: localStorage.getItem('userId'),
+          nickname: localStorage.getItem('nickname'),
+          card: card,
+        },
+      })
+    );
+  };
 
   const addRoom = async (res) => {
     dispatch(addRoomAction(res));
@@ -52,6 +69,7 @@ const GamePage = (props) => {
         if (user.nickname === localStorage.getItem('nickname')) {
           addUser(user);
         }
+        return null;
       });
     }
 
@@ -63,18 +81,29 @@ const GamePage = (props) => {
     <div className={classes.main}>
       {user && room && (
         <>
-          <div>{currentPlayer}</div>
+          <div className={classes.label}>{currentPlayer}</div>
           <div className={classes.cardsList}>
             {room.users.map((usr) => {
               if (usr.nickname === currentPlayer) {
                 return usr.cards.map((card) => {
-                  return <CardItem key={card.id} card={card} />;
+                  return (
+                    <CardItem
+                      key={card.id}
+                      card={card}
+                      currentPlayer={currentPlayer}
+                      openCard={openCard}
+                    />
+                  );
                 });
               }
               return null;
             })}
           </div>
-          <PlayerSwicher currentPlayer={currentPlayer} room={room} />
+          <PlayerSwicher
+            currentPlayer={currentPlayer}
+            setCurrentPlayer={setCurrentPlayer}
+            room={room}
+          />
         </>
       )}
     </div>

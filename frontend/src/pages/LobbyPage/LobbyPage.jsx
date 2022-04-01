@@ -11,7 +11,6 @@ import {
   addUserAction,
 } from '../../store/actions/roomActions';
 import { getRoom } from '../../api/room';
-import { getCards } from '../../api/card';
 import NewUserPage from '../NewUserPage/NewUserPage';
 
 const useStyles = makeStyles(() => ({
@@ -101,10 +100,6 @@ const LobbyPage = (props) => {
     localStorage.clear();
   };
 
-  if (room) {
-    console.log(room);
-  }
-
   // ----------------------- FIX REDIRECT --------------------------
   useEffect(() => {
     // async function fetchData() {
@@ -151,6 +146,7 @@ const LobbyPage = (props) => {
         if (user.nickname === localStorage.getItem('nickname')) {
           addUser(user);
         }
+        return null;
       });
     }
 
