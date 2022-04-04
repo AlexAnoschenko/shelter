@@ -1,4 +1,5 @@
 import { makeStyles } from '@mui/styles';
+import ApocalypseInfo from './components/ApocalypseInfo/ApocalypseInfo';
 
 import CardItem from './components/CardItem/CardItem';
 import PlayerSwicher from './components/PlayerSwicher/PlayerSwicher';
@@ -59,6 +60,7 @@ const GamePage = (props) => {
             room={room}
           />
           <ShelterInfo room={room} />
+          <ApocalypseInfo room={room} />
         </>
       )}
     </div>
