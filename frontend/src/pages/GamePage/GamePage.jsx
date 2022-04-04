@@ -77,6 +77,15 @@ const GamePage = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    socket.onmessage = (event) => {
+      if (JSON.parse(event.data).users) {
+        addRoom(JSON.parse(event.data));
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket]);
+
   return (
     <div className={classes.main}>
       {user && room && (

@@ -67,6 +67,36 @@ app.ws('/', (ws, req) => {
           });
         });
         break;
+
+      case 'openCard':
+        Room.findById(msg.id).then(async (room) => {
+          room.users.forEach((user) => {
+            if (msg.user.userId === user.userId) {
+              user.cards.forEach(async (card) => {
+                if (String(card.id) === msg.user.card.id) {
+                  card.isVisible = true;
+
+                  await Room.findOneAndUpdate(
+                    { _id: msg.id },
+                    {
+                      $set: {
+                        users: room.users,
+                      },
+                    }
+                  ).clone();
+                }
+              });
+            }
+          });
+
+          ws.id = msg.id;
+          aWss.clients.forEach((client) => {
+            if (client.id === msg.id) {
+              client.send(JSON.stringify(room));
+            }
+          });
+        });
+        break;
     }
   });
 });
