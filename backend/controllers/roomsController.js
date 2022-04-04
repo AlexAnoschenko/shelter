@@ -18,6 +18,7 @@ class roomsController {
           },
         ],
         shelter: null,
+        apocalypse: null,
         numberOfPlayers: numberOfPlayers,
       });
 
@@ -32,6 +33,7 @@ class roomsController {
           cards: [],
         },
         shelter: null,
+        apocalypse: null,
         numberOfPlayers: numberOfPlayers,
       });
     } catch (e) {

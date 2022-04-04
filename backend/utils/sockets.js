@@ -1,6 +1,7 @@
 const Room = require('../models/room');
 const Card = require('../models/card');
 const Shelter = require('../models/shelter');
+const Apocalypse = require('../models/apocalypse');
 const { shuffle } = require('./services');
 
 function connectionHandler(ws, msg, aWss) {
@@ -26,12 +27,16 @@ function addUserHandler(ws, msg, aWss) {
       shuffle(shelters);
       shelters[0].capacity = Math.floor(room.users.length / 2);
 
+      const apocalypses = await Apocalypse.find({});
+      shuffle(apocalypses);
+
       await Room.findOneAndUpdate(
         { _id: msg.id },
         {
           $set: {
             users: room.users,
             shelter: shelters[0],
+            apocalypse: apocalypses[0],
           },
         }
       ).clone();
