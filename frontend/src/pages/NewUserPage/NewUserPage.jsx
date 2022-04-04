@@ -31,8 +31,20 @@ const NewUserPage = ({ updateStoreRoom }) => {
   const dispatch = useDispatch();
   const { id } = useParams();
 
-  const addUser = async (res) => {
+  const addUserStore = async (res) => {
     dispatch(addUserAction(res));
+  };
+
+  const connectNewUserSocket = (id, res) => {
+    socket.send(
+      JSON.stringify({
+        method: 'connection',
+        id: id,
+        role: 'player',
+        nickname: res.data.user.nickname,
+        cards: [],
+      })
+    );
   };
 
   const formik = useFormik({
@@ -44,18 +56,8 @@ const NewUserPage = ({ updateStoreRoom }) => {
         nickname: values.nickname,
         id,
       });
-      addUser(res.data.user);
-
-      socket.send(
-        JSON.stringify({
-          method: 'connection',
-          id: id,
-          role: 'player',
-          nickname: res.data.user.nickname,
-          cards: [],
-        })
-      );
-
+      addUserStore(res.data.user);
+      connectNewUserSocket(id, res);
       updateStoreRoom();
     },
     validationSchema: CreateUserSchema,

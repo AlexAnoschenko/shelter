@@ -1,14 +1,8 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 
-import { getRoom } from '../../api/room';
-import {
-  addRoomAction,
-  addUserAction,
-} from '../../store/actions/roomActions';
 import CardItem from './components/CardItem/CardItem';
 import PlayerSwicher from './components/PlayerSwicher/PlayerSwicher';
+import { useGamePage } from './hooks';
 
 const useStyles = makeStyles(() => ({
   main: {
@@ -32,59 +26,9 @@ const useStyles = makeStyles(() => ({
 
 const GamePage = (props) => {
   const classes = useStyles();
-  const dispatch = useDispatch();
-  const { user, room, socket } = useSelector((state) => state.room);
-  const [currentPlayer, setCurrentPlayer] = useState(
-    localStorage.getItem('nickname')
-  );
 
-  const openCard = (card) => {
-    socket.send(
-      JSON.stringify({
-        method: 'openCard',
-        id: room._id,
-        user: {
-          userId: localStorage.getItem('userId'),
-          nickname: localStorage.getItem('nickname'),
-          card: card,
-        },
-      })
-    );
-  };
-
-  const addRoom = async (res) => {
-    dispatch(addRoomAction(res));
-  };
-
-  const addUser = async (res) => {
-    dispatch(addUserAction(res));
-  };
-
-  useEffect(() => {
-    async function fetchData() {
-      const res = await getRoom(props.match.params.id);
-      addRoom(res.data);
-
-      res.data.users.map((user) => {
-        if (user.nickname === localStorage.getItem('nickname')) {
-          addUser(user);
-        }
-        return null;
-      });
-    }
-
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    socket.onmessage = (event) => {
-      if (JSON.parse(event.data).users) {
-        addRoom(JSON.parse(event.data));
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket]);
+  const { user, room, currentPlayer, setCurrentPlayer, openCard } =
+    useGamePage(props);
 
   return (
     <div className={classes.main}>

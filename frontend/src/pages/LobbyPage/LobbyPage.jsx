@@ -1,17 +1,10 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
 import { TelegramShareButton, TelegramIcon } from 'react-share';
 
 import Loader from '../../components/Loader/Loader';
 import UsersLoader from '../../components/UsersLoader/UsersLoader';
-import {
-  addRoomAction,
-  addUserAction,
-} from '../../store/actions/roomActions';
-import { getRoom } from '../../api/room';
 import NewUserPage from '../NewUserPage/NewUserPage';
+import { useLobbyPage } from './hooks';
 
 const useStyles = makeStyles(() => ({
   main: {
@@ -64,95 +57,8 @@ const useStyles = makeStyles(() => ({
 
 const LobbyPage = (props) => {
   const classes = useStyles();
-  const dispatch = useDispatch();
-  const router = useHistory();
-  const { room, socket } = useSelector((state) => state.room);
-  const nickname = localStorage.getItem('nickname');
-
-  const updateStoreRoom = () => {
-    socket.send(
-      JSON.stringify({
-        method: 'updateRoom',
-        id: room._id,
-        user: {
-          userId: localStorage.getItem('userId'),
-          role: 'player',
-          nickname: localStorage.getItem('nickname'),
-          cards: [],
-        },
-      })
-    );
-  };
-
-  const getRoomIdFromLS = () => {
-    return localStorage.getItem('roomId');
-  };
-
-  const addRoom = async (res) => {
-    dispatch(addRoomAction(res));
-  };
-
-  const addUser = async (res) => {
-    dispatch(addUserAction(res));
-  };
-
-  const clearLS = () => {
-    localStorage.clear();
-  };
-
-  // ----------------------- FIX REDIRECT --------------------------
-  useEffect(() => {
-    // async function fetchData() {
-    //   const res = await getCards(props.match.params.id);
-    //   addRoom(res.data);
-    // }
-
-    if (room && room.users.length === room.numberOfPlayers) {
-      router.push(`/gamePage/${localStorage.getItem('roomId')}`);
-
-      // fetchData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room]);
-
-  useEffect(() => {
-    if (socket.readyState === 1) {
-      socket.send(
-        JSON.stringify({
-          method: 'connection',
-          nickname: localStorage.getItem('nickname'),
-          id: localStorage.getItem('roomId'),
-        })
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket.readyState]);
-
-  useEffect(() => {
-    socket.onmessage = (event) => {
-      if (JSON.parse(event.data).users) {
-        addRoom(JSON.parse(event.data));
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket]);
-
-  useEffect(() => {
-    async function fetchData() {
-      const res = await getRoom(props.match.params.id);
-      addRoom(res.data);
-
-      res.data.users.map((user) => {
-        if (user.nickname === localStorage.getItem('nickname')) {
-          addUser(user);
-        }
-        return null;
-      });
-    }
-
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { room, nickname, updateStoreRoom, getRoomIdFromLS, clearLS } =
+    useLobbyPage(props);
 
   return (
     <div className={classes.main}>
@@ -164,11 +70,7 @@ const LobbyPage = (props) => {
           <TelegramShareButton
             url={`http://localhost:3000/lobbyPage/${getRoomIdFromLS()}`}
           >
-            <TelegramIcon
-              size={256}
-              round={true}
-              className={classes.tgIcon}
-            />
+            <TelegramIcon size={256} round={true} className={classes.tgIcon} />
           </TelegramShareButton>
           <Loader />
           {room ? (
@@ -180,9 +82,9 @@ const LobbyPage = (props) => {
                 {room.users.map((user) => (
                   <div
                     style={{
-                      color: `#${Math.floor(
-                        Math.random() * 16777215
-                      ).toString(16)}`,
+                      color: `#${Math.floor(Math.random() * 16777215).toString(
+                        16
+                      )}`,
                     }}
                     key={user.userId}
                   >
