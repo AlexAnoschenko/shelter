@@ -17,6 +17,7 @@ class roomsController {
             cards: [],
           },
         ],
+        shelter: null,
         numberOfPlayers: numberOfPlayers,
       });
 
@@ -30,6 +31,7 @@ class roomsController {
           nickname: nickname,
           cards: [],
         },
+        shelter: null,
         numberOfPlayers: numberOfPlayers,
       });
     } catch (e) {

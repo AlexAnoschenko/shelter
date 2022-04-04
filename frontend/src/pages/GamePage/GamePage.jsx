@@ -2,6 +2,7 @@ import { makeStyles } from '@mui/styles';
 
 import CardItem from './components/CardItem/CardItem';
 import PlayerSwicher from './components/PlayerSwicher/PlayerSwicher';
+import ShelterInfo from './components/ShelterInfo/ShelterInfo';
 import { useGamePage } from './hooks';
 
 const useStyles = makeStyles(() => ({
@@ -57,6 +58,7 @@ const GamePage = (props) => {
             setCurrentPlayer={setCurrentPlayer}
             room={room}
           />
+          <ShelterInfo room={room} />
         </>
       )}
     </div>
