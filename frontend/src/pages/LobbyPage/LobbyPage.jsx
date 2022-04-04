@@ -11,7 +11,6 @@ import {
   addUserAction,
 } from '../../store/actions/roomActions';
 import { getRoom } from '../../api/room';
-import { getCards } from '../../api/card';
 import NewUserPage from '../NewUserPage/NewUserPage';
 
 const useStyles = makeStyles(() => ({
@@ -70,10 +69,6 @@ const LobbyPage = (props) => {
   const { room, socket } = useSelector((state) => state.room);
   const nickname = localStorage.getItem('nickname');
 
-  if (room?.users[0].cards.length) {
-    console.log(room.users[0].cards);
-  }
-
   const updateStoreRoom = () => {
     socket.send(
       JSON.stringify({
@@ -81,6 +76,7 @@ const LobbyPage = (props) => {
         id: room._id,
         user: {
           userId: localStorage.getItem('userId'),
+          role: 'player',
           nickname: localStorage.getItem('nickname'),
           cards: [],
         },
@@ -104,17 +100,17 @@ const LobbyPage = (props) => {
     localStorage.clear();
   };
 
+  // ----------------------- FIX REDIRECT --------------------------
   useEffect(() => {
-    async function fetchData() {
-      const res = await getCards(props.match.params.id);
-      console.log(res); // ----------------------------------- Users with Cards --------- !!!
-      addRoom(res.data);
-    }
+    // async function fetchData() {
+    //   const res = await getCards(props.match.params.id);
+    //   addRoom(res.data);
+    // }
 
     if (room && room.users.length === room.numberOfPlayers) {
       router.push(`/gamePage/${localStorage.getItem('roomId')}`);
 
-      fetchData();
+      // fetchData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room]);
@@ -145,12 +141,15 @@ const LobbyPage = (props) => {
     async function fetchData() {
       const res = await getRoom(props.match.params.id);
       addRoom(res.data);
+
+      res.data.users.map((user) => {
+        if (user.nickname === localStorage.getItem('nickname')) {
+          addUser(user);
+        }
+        return null;
+      });
     }
 
-    addUser({
-      userId: localStorage.getItem('userId'),
-      nickname: localStorage.getItem('nickname'),
-    });
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

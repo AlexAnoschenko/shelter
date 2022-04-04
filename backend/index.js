@@ -8,6 +8,14 @@ const dotenv = require('dotenv');
 const roomsRouters = require('./routers/roomsRouter');
 const cardsRouters = require('./routers/cardsRouter');
 const Room = require('./models/room');
+const Card = require('./models/card');
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
 
 dotenv.config();
 
@@ -25,9 +33,62 @@ app.ws('/', (ws, req) => {
         break;
 
       case 'updateRoom':
-        Room.findById(msg.id).then((room) => {
+        Room.findById(msg.id).then(async (room) => {
           room.users.push(msg.user);
           room.save();
+
+          if (room.users.length === room.numberOfPlayers) {
+            const cards = await Card.find({});
+
+            room.users.forEach((user, userIndex) => {
+              cards[0].cards.forEach((type, cardsIndex) => {
+                for (let key in type) {
+                  shuffle(type[key]);
+                  room.users[userIndex].cards.push(type[key].shift());
+                }
+              });
+            });
+
+            await Room.findOneAndUpdate(
+              { _id: msg.id },
+              {
+                $set: {
+                  users: room.users,
+                },
+              }
+            ).clone();
+          }
+
+          ws.id = msg.id;
+          aWss.clients.forEach((client) => {
+            if (client.id === msg.id) {
+              client.send(JSON.stringify(room));
+            }
+          });
+        });
+        break;
+
+      case 'openCard':
+        Room.findById(msg.id).then(async (room) => {
+          room.users.forEach((user) => {
+            if (msg.user.userId === user.userId) {
+              user.cards.forEach(async (card) => {
+                if (String(card.id) === msg.user.card.id) {
+                  card.isVisible = true;
+
+                  await Room.findOneAndUpdate(
+                    { _id: msg.id },
+                    {
+                      $set: {
+                        users: room.users,
+                      },
+                    }
+                  ).clone();
+                }
+              });
+            }
+          });
+
           ws.id = msg.id;
           aWss.clients.forEach((client) => {
             if (client.id === msg.id) {

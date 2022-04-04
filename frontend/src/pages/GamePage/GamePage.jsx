@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@mui/styles';
 
@@ -8,16 +8,18 @@ import {
   addUserAction,
 } from '../../store/actions/roomActions';
 import CardItem from './components/CardItem/CardItem';
+import PlayerSwicher from './components/PlayerSwicher/PlayerSwicher';
 
 const useStyles = makeStyles(() => ({
   main: {
-    height: '100vh',
     display: 'flex',
     flexDirection: 'column',
-    // justifyContent: 'center',
     alignItems: 'center',
     gap: 18,
     padding: 10,
+  },
+  label: {
+    fontSize: '28px',
   },
   cardsList: {
     display: 'flex',
@@ -31,7 +33,24 @@ const useStyles = makeStyles(() => ({
 const GamePage = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { user, room } = useSelector((state) => state.room);
+  const { user, room, socket } = useSelector((state) => state.room);
+  const [currentPlayer, setCurrentPlayer] = useState(
+    localStorage.getItem('nickname')
+  );
+
+  const openCard = (card) => {
+    socket.send(
+      JSON.stringify({
+        method: 'openCard',
+        id: room._id,
+        user: {
+          userId: localStorage.getItem('userId'),
+          nickname: localStorage.getItem('nickname'),
+          card: card,
+        },
+      })
+    );
+  };
 
   const addRoom = async (res) => {
     dispatch(addRoomAction(res));
@@ -45,30 +64,55 @@ const GamePage = (props) => {
     async function fetchData() {
       const res = await getRoom(props.match.params.id);
       addRoom(res.data);
+
+      res.data.users.map((user) => {
+        if (user.nickname === localStorage.getItem('nickname')) {
+          addUser(user);
+        }
+        return null;
+      });
     }
 
-    addUser({
-      userId: localStorage.getItem('userId'),
-      nickname: localStorage.getItem('nickname'),
-    });
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    socket.onmessage = (event) => {
+      if (JSON.parse(event.data).users) {
+        addRoom(JSON.parse(event.data));
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket]);
 
   return (
     <div className={classes.main}>
       {user && room && (
         <>
-          <div>{user.nickname}</div>
+          <div className={classes.label}>{currentPlayer}</div>
           <div className={classes.cardsList}>
             {room.users.map((usr) => {
-              if (usr.nickname === user.nickname) {
+              if (usr.nickname === currentPlayer) {
                 return usr.cards.map((card) => {
-                  return <CardItem card={card} />;
+                  return (
+                    <CardItem
+                      key={card.id}
+                      card={card}
+                      currentPlayer={currentPlayer}
+                      openCard={openCard}
+                    />
+                  );
                 });
               }
+              return null;
             })}
           </div>
+          <PlayerSwicher
+            currentPlayer={currentPlayer}
+            setCurrentPlayer={setCurrentPlayer}
+            room={room}
+          />
         </>
       )}
     </div>

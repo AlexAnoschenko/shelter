@@ -20,11 +20,17 @@ const CustomButton = ({
   width = 280,
   height = 55,
   type = 'button',
+  onClickHandler,
 }) => {
   const classes = useStyles({ width, height });
 
   return (
-    <Button sx={classes.root} variant='contained' type={type}>
+    <Button
+      sx={classes.root}
+      variant='contained'
+      type={type}
+      onClick={onClickHandler}
+    >
       {textButton}
     </Button>
   );

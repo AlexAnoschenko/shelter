@@ -49,8 +49,9 @@ const NewUserPage = ({ updateStoreRoom }) => {
       socket.send(
         JSON.stringify({
           method: 'connection',
-          nickname: res.data.user.nickname,
           id: id,
+          role: 'player',
+          nickname: res.data.user.nickname,
           cards: [],
         })
       );
