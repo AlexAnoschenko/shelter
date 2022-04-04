@@ -1,14 +1,10 @@
 const Room = require('../models/room');
 const Card = require('../models/card');
+const Shelter = require('../models/shelter');
 const { shuffle } = require('./services');
 
 function connectionHandler(ws, msg, aWss) {
-  broadcastConnection(
-    ws,
-    msg,
-    aWss,
-    `user ${msg.nickname} connected`
-  );
+  broadcastConnection(ws, msg, aWss, `user ${msg.nickname} connected`);
 }
 
 function addUserHandler(ws, msg, aWss) {
@@ -25,11 +21,17 @@ function addUserHandler(ws, msg, aWss) {
           }
         });
       });
+
+      const shelters = await Shelter.find({});
+      shuffle(shelters);
+      shelters[0].capacity = Math.floor(room.users.length / 2);
+
       await Room.findOneAndUpdate(
         { _id: msg.id },
         {
           $set: {
             users: room.users,
+            shelter: shelters[0],
           },
         }
       ).clone();

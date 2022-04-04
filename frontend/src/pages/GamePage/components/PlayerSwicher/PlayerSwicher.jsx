@@ -1,6 +1,6 @@
 import { makeStyles } from '@mui/styles';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   main: {
     display: 'flex',
     flexDirection: 'column',
@@ -49,9 +49,7 @@ const PlayerSwicher = ({ currentPlayer, setCurrentPlayer, room }) => {
             className={classes.playerItem}
             style={{
               backgroundColor:
-                user.nickname === currentPlayer
-                  ? '#019601'
-                  : '#3b3b3b',
+                user.nickname === currentPlayer ? '#019601' : '#3b3b3b',
             }}
             onClick={() => swichPlayer(user.nickname)}
           >
