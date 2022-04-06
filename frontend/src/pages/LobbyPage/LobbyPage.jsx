@@ -63,6 +63,7 @@ const LobbyPage = (props) => {
   return (
     <div className={classes.main}>
       <button onClick={clearLS}>Clear LS</button>
+
       {nickname ? (
         <>
           <div className={classes.title}>Share Link</div>

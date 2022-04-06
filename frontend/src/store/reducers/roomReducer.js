@@ -1,7 +1,9 @@
+import ReconnectingWebSocket from 'reconnectingwebsocket';
+
 const initialValues = {
   user: null,
   room: null,
-  socket: new WebSocket('ws://localhost:5001/'),
+  socket: new ReconnectingWebSocket('ws://lit-dawn-13539.herokuapp.com'), // ws://localhost:5001/
 };
 
 export const roomReducer = (state = initialValues, action) => {
